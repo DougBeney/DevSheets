@@ -1,4 +1,7 @@
+import os
+from os.path import expanduser
 import argparse
+
 import pyexcel as pe
 
 from dougsheets import plugin
@@ -10,7 +13,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     filename = args.file
 
-    spreadsheet.NewWindow(filename, './plugins')
+    UserPluginDirectory = os.path.join(expanduser('~'), '.config/dougsheets/plugins')
+
+    print(UserPluginDirectory)
+    if not os.path.exists(UserPluginDirectory):
+        os.makedirs(UserPluginDirectory)
+
+    spreadsheet.NewWindow(filename, UserPluginDirectory)
 
 # sheet.save_as(input("Save as: "))
 
