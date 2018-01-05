@@ -1,7 +1,8 @@
 import argparse
 import pyexcel as pe
 
-import gui
+from dougsheets import plugin
+from dougsheets import spreadsheet
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filter spreadsheet')
@@ -9,7 +10,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     filename = args.file
 
-    gui.GUI(filename)
+    spreadsheet.NewWindow(filename, './plugins')
 
 # sheet.save_as(input("Save as: "))
 

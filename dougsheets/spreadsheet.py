@@ -2,9 +2,10 @@ import wx
 import wx.grid
 import pyexcel as pe
 
-import filters
+from . import pluginmanager
 
-class GUI:
+
+class NewWindow:
     def init_window(self):
         self.MainPanel = wx.Panel(self.frame)
         self.sheetWidget = wx.grid.Grid(self.MainPanel)
@@ -19,27 +20,20 @@ class GUI:
 
     def init_menu(self):
         # Menu Bar
-        menubar = wx.MenuBar()
-        self.frame.SetMenuBar(menubar)
+        self.MenuBar = wx.MenuBar()
+        self.frame.SetMenuBar(self.MenuBar)
 
         # File Menu
-        fileMenu = wx.Menu()
-        menubar.Append(fileMenu, '&File')
-        save = fileMenu.Append(wx.ID_SAVE, 'Save')
-        saveas = fileMenu.Append(wx.ID_SAVEAS, 'Save as')
-        fitem = fileMenu.Append(wx.ID_EXIT, 'Quit', 'Quit application')
+        self.menu_file = wx.Menu()
+        self.MenuBar.Append(self.menu_file, '&File')
+        save = self.menu_file.Append(wx.ID_SAVE, 'Save')
+        saveas = self.menu_file.Append(wx.ID_SAVEAS, 'Save as')
+        fitem = self.menu_file.Append(wx.ID_EXIT, 'Quit', 'Quit application')
         self.frame.Bind(wx.EVT_MENU, self.OnQuit, fitem)
 
         # Filters Menu
-        filterMenu = wx.Menu()
-        menubar.Append(filterMenu, 'Filters')
-        filters.the_window = self
-        for filter in filters.FUNCTION_LIST:
-            self.frame.Bind(
-                wx.EVT_MENU,
-                filter['function'],
-                filterMenu.Append(wx.ID_ANY, filter['title'])
-            )
+        self.menu_filter = wx.Menu()
+        self.MenuBar.Append(self.menu_filter, 'Filters')
 
     def clear_sheet(self, rows, cols):
         cur_rows = self.sheetWidget.GetNumberCols()
@@ -56,13 +50,14 @@ class GUI:
         self.update_sheet()
 
     def update_sheet(self):
-        print("Updating sheet.")
         sheetObject = self.sheetObject
+
+        max_cols = len(sheetObject)
         max_rows = 1
         for col in sheetObject:
             if len(col[1]) > max_rows:
                 max_rows = len(col[1])+1
-        self.clear_sheet(max_rows, len(sheetObject))
+        self.clear_sheet(max_rows, max_cols)
         for col_index in range(0, len(sheetObject)):
             self.sheetWidget.SetCellValue(0, col_index, sheetObject[col_index][0])
             for row_index in range(0, len(sheetObject[col_index][1])):
@@ -83,7 +78,8 @@ class GUI:
 
     def showMessage(self, title, text, styles=wx.OK):
         wx.MessageBox(str(text), str(title), styles)
-    def __init__(self, filename):
+
+    def __init__(self, filename, pluginDir="~/.config/dougsheets"):
         app = wx.App()
         self.frame = wx.Frame(None, -1, filename)
         # Setting size twice to avoid sheet glitch
@@ -94,6 +90,7 @@ class GUI:
         self.init_window()
         self.init_menu()
         self.load_sheet(filename)
+        pluginmanager.LoadPlugins(self, pluginDir)
         self.frame.Show()
         self.frame.Center()
         app.MainLoop()
