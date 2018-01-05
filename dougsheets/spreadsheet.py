@@ -1,3 +1,4 @@
+import os
 import wx
 import wx.grid
 import pyexcel as pe
@@ -26,10 +27,8 @@ class NewWindow:
         # File Menu
         self.menu_file = wx.Menu()
         self.MenuBar.Append(self.menu_file, '&File')
-        save = self.menu_file.Append(wx.ID_SAVE, 'Save')
-        saveas = self.menu_file.Append(wx.ID_SAVEAS, 'Save as')
-        fitem = self.menu_file.Append(wx.ID_EXIT, 'Quit', 'Quit application')
-        self.frame.Bind(wx.EVT_MENU, self.OnQuit, fitem)
+        menu_file_quit = self.menu_file.Append(wx.ID_EXIT, 'Quit', 'Quit application')
+        self.frame.Bind(wx.EVT_MENU, self.OnQuit, menu_file_quit)
 
         # Filters Menu
         self.menu_filter = wx.Menu()
@@ -65,7 +64,7 @@ class NewWindow:
 
 
     def OnQuit(self, e):
-        self.Close()
+        self.frame.Close()
 
     def getDialog(self, title, text):
         dlg = wx.TextEntryDialog(self.frame, text, title)
@@ -79,7 +78,7 @@ class NewWindow:
     def showMessage(self, title, text, styles=wx.OK):
         wx.MessageBox(str(text), str(title), styles)
 
-    def __init__(self, filename, pluginDir="~/.config/dougsheets"):
+    def __init__(self, filename, pluginDirs=[os.path.abspath('sysplugins/')]):
         app = wx.App()
         self.frame = wx.Frame(None, -1, filename)
         # Setting size twice to avoid sheet glitch
@@ -90,7 +89,7 @@ class NewWindow:
         self.init_window()
         self.init_menu()
         self.load_sheet(filename)
-        pluginmanager.LoadPlugins(self, pluginDir)
+        self.pluginmanager = pluginmanager.LoadPlugins(self, pluginDirs)
         self.frame.Show()
         self.frame.Center()
         app.MainLoop()

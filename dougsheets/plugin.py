@@ -14,8 +14,8 @@ class Plugin:
         self.gui.MenuBar.Append(menu, text)
         return menu
 
-    def createMenuItem(self, menu, text, action=exampleAction, help=""):
-        item = menu.Append(wx.ID_ANY, text, help)
+    def createMenuItem(self, menu, text, action=exampleAction, help="", id=wx.ID_ANY):
+        item = menu.Append(id, text, help)
         self.gui.frame.Bind(wx.EVT_MENU, action, item)
 
     def col2num(self, col):
