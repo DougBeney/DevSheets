@@ -44,16 +44,20 @@ install_unix:
 	sudo cp -r sysplugins/ /etc/dougsheets/
 	sudo rm -rf /etc/dougsheets/sysplugins/__pycache__
 
-dougsheets = $(APPDATA)/dougsheets
-sysplugins = $(dougsheets)/sysplugins
-userplugins = $(dougsheets)/plugins
+	mkdir -p ~/.config/dougsheets
+	cp -r examples/ ~/.config/dougsheets
+
+# Windows-related variables
+WINDOWS_dougsheets = $(APPDATA)/WINDOWS_dougsheets
+WINDOWS_sysplugins = $(WINDOWS_dougsheets)/WINDOWS_sysplugins
+WINDOWS_userplugins = $(WINDOWS_dougsheets)/plugins
 
 install_windows:
-	if [ -d "$(sysplugins)" ]; then rm -rf $(sysplugins); fi
-	mkdir -p $(dougsheets)
-	mkdir -p $(userplugins)
-	cp -rf dist/dougsheets $(dougsheets)/app
-	cp -r sysplugins $(dougsheets)
+	if [ -d "$(WINDOWS_sysplugins)" ]; then rm -rf $(WINDOWS_sysplugins); fi
+	mkdir -p $(WINDOWS_dougsheets)
+	mkdir -p $(WINDOWS_userplugins)
+	cp -rf dist/WINDOWS_dougsheets $(WINDOWS_dougsheets)/app
+	cp -r WINDOWS_sysplugins $(WINDOWS_dougsheets)
 
 # Deletes build files
 clean:
