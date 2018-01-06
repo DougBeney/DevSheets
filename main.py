@@ -11,14 +11,24 @@ if __name__ == '__main__':
     args = parser.parse_args()
     filename = args.file
 
-    SysPluginDirectory = os.path.abspath('sysplugins/')
-    if not os.path.exists(SysPluginDirectory):
-        SysPluginDirectory = "/etc/dougsheets/sysplugins"
+    if os.path.isfile(filename):
+        SysPluginDirectory = os.path.abspath('sysplugins/')
+        if not os.path.exists(SysPluginDirectory):
+            if os.name is not "nt":
+                SysPluginDirectory = "/etc/dougsheets/sysplugins"
+            else:
+                SysPluginDirectory = os.path.join(os.getenv('APPDATA'), "dougsheets/sysplugins")
 
-    UserPluginDirectory = os.path.join(expanduser('~'), '.config/dougsheets/plugins')
+        if os.name is not "nt":
+            UserPluginDirectory = os.path.join(expanduser('~'), '.config/dougsheets/plugins')
+        else:
+            # I am sorry that you have to use Windows :(
+            UserPluginDirectory = os.path.join(os.getenv('APPDATA'), "dougsheets/plugins")
 
-    if not os.path.exists(UserPluginDirectory):
-        os.makedirs(UserPluginDirectory)
+        if not os.path.exists(UserPluginDirectory):
+            os.makedirs(UserPluginDirectory)
 
-    spreadsheet.NewWindow(filename, [SysPluginDirectory, UserPluginDirectory])
+        spreadsheet.NewWindow(filename, [SysPluginDirectory, UserPluginDirectory])
+    else:
+        print("DougSheets: File does not exist: " + filename)
 
