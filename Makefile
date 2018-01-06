@@ -44,17 +44,18 @@ install_unix:
 	sudo cp -r sysplugins/ /etc/dougsheets/
 	sudo rm -rf /etc/dougsheets/sysplugins/__pycache__
 
+dougsheets = $(APPDATA)/dougsheets
+sysplugins = $(dougsheets)/sysplugins
+userplugins = $(dougsheets)/plugins
+
 install_windows:
-	dougsheets=$(APPDATA)\dougsheets
-	sysplugins=$(dougsheets)/sysplugins
-	userplugins=$(dougsheets)/plugins
-	if [ -d "$(sysplugins)" ]; then sudo rm -rf $(sysplugins); fi
-	mkdir -p $(sysplugins)
+	if [ -d "$(sysplugins)" ]; then rm -rf $(sysplugins); fi
+	mkdir -p $(dougsheets)
 	mkdir -p $(userplugins)
-	cp -rf dist/dougsheets $(dougsheets)
-	cp -r sysplugins/ $(sysplugins)
-	rm -rf $(sysplugins)/__pycache__
+	cp -rf dist/dougsheets $(dougsheets)/app
+	cp -r sysplugins $(dougsheets)
 
 # Deletes build files
 clean:
 	rm -rf build/ dist/ *.spec
+
