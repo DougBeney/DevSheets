@@ -2,3 +2,6 @@
 .ropeproject/
 __pycache__/
 *.vim
+build/
+dist/
+main.spec

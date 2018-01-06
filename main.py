@@ -12,6 +12,9 @@ if __name__ == '__main__':
     filename = args.file
 
     SysPluginDirectory = os.path.abspath('sysplugins/')
+    if not os.path.exists(SysPluginDirectory):
+        SysPluginDirectory = "/etc/dougsheets/sysplugins"
+
     UserPluginDirectory = os.path.join(expanduser('~'), '.config/dougsheets/plugins')
 
     if not os.path.exists(UserPluginDirectory):

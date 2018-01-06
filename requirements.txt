@@ -1,3 +1,4 @@
 pluginbase==0.5
 pyexcel==0.5.6
 wxPython==4.0.0b2
+pyinstaller==3.3.1
