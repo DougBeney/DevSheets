@@ -1,7 +1,10 @@
+import os
 import string
 import wx
 
 class Plugin:
+    OPEN_PROMPT = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
+    SAVE_PROMPT = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
     def init(self):
         # This is the method you would overwrite
         pass
@@ -27,6 +30,21 @@ class Plugin:
 
     def showMessage(self, title, question, styles=wx.OK):
         self.gui.showMessage(title, question, styles)
+
+    def getFilePath(self, type=OPEN_PROMPT, message="File Dialog", default_directory=None, default_filename=None, wildcard_file_selector="*"):
+        base = os.path.basename(self.gui.filename)
+        dir = self.gui.filename.replace(base, '')
+        if not default_directory:
+            default_directory = dir
+        if not default_filename:
+            default_filename = base
+        openFileDialog = wx.FileDialog(self.gui.frame, message, default_directory, default_filename, wildcard_file_selector, type)
+        the_modal = openFileDialog.ShowModal()
+        if the_modal == wx.ID_CANCEL:
+            return None
+        choosen_path = openFileDialog.GetPath()
+        openFileDialog.Destroy()
+        return choosen_path
 
     def getDialog(self, title, question):
         return self.gui.getDialog(title, question)

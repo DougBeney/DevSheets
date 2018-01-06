@@ -27,12 +27,14 @@ class NewWindow:
         # File Menu
         self.menu_file = wx.Menu()
         self.MenuBar.Append(self.menu_file, '&File')
-        menu_file_quit = self.menu_file.Append(wx.ID_EXIT, 'Quit', 'Quit application')
-        self.frame.Bind(wx.EVT_MENU, self.OnQuit, menu_file_quit)
 
-        # Filters Menu
+        # Edit Menu
+        self.menu_edit = wx.Menu()
+        self.MenuBar.Append(self.menu_edit, '&Edit')
+
+        # Filter Menu
         self.menu_filter = wx.Menu()
-        self.MenuBar.Append(self.menu_filter, 'Filters')
+        self.MenuBar.Append(self.menu_filter, 'F&ilters')
 
     def clear_sheet(self, rows, cols):
         cur_rows = self.sheetWidget.GetNumberCols()
@@ -44,27 +46,23 @@ class NewWindow:
 
 
     def load_sheet(self, filename):
-        loaded_sheet = pe.get_dict(file_name=filename)
-        self.sheetObject = list(loaded_sheet.items())
+        # loaded_sheet = pe.get_dict(file_name=filename)
+        self.sheetObject = pe.get_array(file_name=filename)
         self.update_sheet()
 
     def update_sheet(self):
         sheetObject = self.sheetObject
 
-        max_cols = len(sheetObject)
-        max_rows = 1
+        amount_of_rows = len(sheetObject)
+        amount_of_cols = 1
+
         for col in sheetObject:
-            if len(col[1]) > max_rows:
-                max_rows = len(col[1])+1
-        self.clear_sheet(max_rows, max_cols)
-        for col_index in range(0, len(sheetObject)):
-            self.sheetWidget.SetCellValue(0, col_index, sheetObject[col_index][0])
-            for row_index in range(0, len(sheetObject[col_index][1])):
-                self.sheetWidget.SetCellValue(row_index+1, col_index, str(sheetObject[col_index][1][row_index]))
-
-
-    def OnQuit(self, e):
-        self.frame.Close()
+            if len(col) > amount_of_cols:
+                amount_of_cols = len(col)
+        self.clear_sheet(amount_of_rows, amount_of_cols)
+        for r in range(0, len(sheetObject)):
+            for c in range(0, len(sheetObject[r])):
+                self.sheetWidget.SetCellValue(r, c, str(sheetObject[r][c]))
 
     def getDialog(self, title, text):
         dlg = wx.TextEntryDialog(self.frame, text, title)
@@ -88,6 +86,7 @@ class NewWindow:
 
         self.init_window()
         self.init_menu()
+        self.filename = filename
         self.load_sheet(filename)
         self.pluginmanager = pluginmanager.LoadPlugins(self, pluginDirs)
         self.frame.Show()
