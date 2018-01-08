@@ -6,11 +6,13 @@ import wx
 class Plugin:
     OPEN_PROMPT = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
     SAVE_PROMPT = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+
     def init(self):
         # This is the method you would overwrite
         pass
 
-    def exampleAction(e):
+
+    def exampleAction(self, e):
         print("This is an example menu item action. Please assign your own.")
 
     def createMenu(self, text):
@@ -40,6 +42,21 @@ class Plugin:
             if c in string.ascii_letters:
                 num = num * 26 + (ord(c.upper()) - ord('A')) + 1
         return num
+
+    def is_number(self, s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            pass
+
+        try:
+            import unicodedata
+            unicodedata.numeric(s)
+            return True
+        except (TypeError, ValueError):
+            pass
+        return False
 
     def showMessage(self, title, text, styles=wx.OK):
         self.gui.showMessage(title, text, styles)
@@ -97,6 +114,30 @@ class Plugin:
                 return None
         else:
             return None
+
+    def getInput__Variable(self, var, title, text, e):
+        if self.CLIVar(var, e):
+            the_variable = self.CLIVar(var, e)
+        else:
+            the_variable = self.getDialog(title, text)
+        return the_variable
+
+    def getInput__Column(self, var, title, text, e):
+        if self.CLIVar(var, e):
+            the_column = self.CLIVar(var, e)
+            if not self.is_number(the_column):
+                the_column = self.col2num(the_column) - 1
+        else:
+            userinput = self.getDialog(title, text)
+            if userinput:
+                the_column = self.col2num(userinput) - 1
+                if col == None or col < 0:
+                    return None
+                else:
+                    return the_column
+            else:
+                return None
+        return the_column
 
     def __init__(self, gui, menu):
         self.gui = gui

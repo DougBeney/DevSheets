@@ -8,7 +8,7 @@ class CreateREPL:
         for cmd in self.commandlist:
             print("> ", cmd['cmd'])
             if cmd.get('help', False):
-                print(cmd['help'])
+                print('   ', cmd['help'])
 
     def cmd_quit(self, dict):
         self.running = False
