@@ -8,10 +8,16 @@ class FileOperations(plugin.Plugin):
         pyexcel.save_as(array=self.gui.sheetObject, dest_file_name=save_dest)
 
     def saveas(self, e):
-        save_file_path = self.getFilePath(self.SAVE_PROMPT, "Save as")
+        if self.hasCLIArguments(e):
+            save_file_path = e['arguments'][0]
+        else:
+            save_file_path = self.getFilePath(self.SAVE_PROMPT, "Save as")
+
         if save_file_path is not None:
             self.gui.filename = save_file_path
             self.save(None)
+            if self.isHeadless():
+                print("Saved!")
 
     def exit(self, e):
         self.gui.frame.Close()

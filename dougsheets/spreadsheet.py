@@ -58,33 +58,41 @@ class NewWindow:
             self.update_sheet()
 
     def update_sheet(self):
-        sheetObject = self.sheetObject
+        if not self.headless:
+            sheetObject = self.sheetObject
 
-        amount_of_rows = len(sheetObject)
-        amount_of_cols = 1
+            amount_of_rows = len(sheetObject)
+            amount_of_cols = 1
 
-        for col in sheetObject:
-            if len(col) > amount_of_cols:
-                amount_of_cols = len(col)
-        self.clear_sheet(amount_of_rows, amount_of_cols)
-        for r in range(0, len(sheetObject)):
-            for c in range(0, len(sheetObject[r])):
-                self.sheetWidget.SetCellValue(r, c, str(sheetObject[r][c]))
+            for col in sheetObject:
+                if len(col) > amount_of_cols:
+                    amount_of_cols = len(col)
+            self.clear_sheet(amount_of_rows, amount_of_cols)
+            for r in range(0, len(sheetObject)):
+                for c in range(0, len(sheetObject[r])):
+                    self.sheetWidget.SetCellValue(r, c, str(sheetObject[r][c]))
 
     def getDialog(self, title, text):
-        dlg = wx.TextEntryDialog(self.frame, text, title)
-        if dlg.ShowModal() == wx.ID_OK:
-            dlg.Destroy()
-            return dlg.GetValue()
+        if not self.headless:
+            dlg = wx.TextEntryDialog(self.frame, text, title)
+            if dlg.ShowModal() == wx.ID_OK:
+                dlg.Destroy()
+                return dlg.GetValue()
+            else:
+                dlg.Destroy()
+                return None
         else:
-            dlg.Destroy()
-            return None
+            return input(title + ": " + text + " ")
 
     def showMessage(self, title, text, styles=wx.OK):
-        wx.MessageBox(str(text), str(title), styles)
+        if not self.headless:
+            wx.MessageBox(str(text), str(title), styles)
+        else:
+            print(title, ": ", text)
 
     def __init__(self, filename, pluginDirs, headless=False):
         self.headless = headless
+        self.filename = filename
         if not headless:
             # Enter GUI Mode
             app = wx.App()
@@ -93,10 +101,8 @@ class NewWindow:
             self.frame.SetSize((500, 600))
             self.frame.Show()
             self.frame.SetSize((800, 600))
-
             self.init_window()
             self.init_menu()
-            self.filename = filename
             self.load_sheet(filename)
             self.pluginmanager = pluginmanager.LoadPlugins(self, pluginDirs)
             self.frame.Show()
@@ -107,8 +113,8 @@ class NewWindow:
             # It is worth noting that in headless mode, the terminology of a 'menu' change
             # A 'menu' is no longer a visual menu in a GUI, but instead a set of commands
             # accessible by the CLI.
-            self.init_menu()
-            self.filename = filename
             self.load_sheet(filename)
+            self.repl = repl.CreateREPL(self)
+            self.init_menu()
             self.pluginmanager = pluginmanager.LoadPlugins(self, pluginDirs)
-            repl.CreateREPL(self)
+            self.repl.REPL_LOOP()

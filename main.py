@@ -8,10 +8,10 @@ from dougsheets import spreadsheet
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filter spreadsheet')
     parser.add_argument('file', help='file name')
-    parser.add_argument('--headless', action='store_true', help='Use commands instead of a GUI')
+    parser.add_argument('--cli', action='store_true', help='Use commands instead of a GUI')
     args = parser.parse_args()
     filename = args.file
-    headless = args.headless
+    headless = args.cli
 
     if os.path.isfile(filename):
         SysPluginDirectory = os.path.abspath('sysplugins/')
