@@ -131,7 +131,7 @@ class Plugin:
             userinput = self.getDialog(title, text)
             if userinput:
                 the_column = self.col2num(userinput) - 1
-                if col == None or col < 0:
+                if the_column == None or the_column < 0:
                     return None
                 else:
                     return the_column
