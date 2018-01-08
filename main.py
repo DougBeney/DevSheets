@@ -8,8 +8,10 @@ from dougsheets import spreadsheet
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filter spreadsheet')
     parser.add_argument('file', help='file name')
+    parser.add_argument('--headless', action='store_true', help='Use commands instead of a GUI')
     args = parser.parse_args()
     filename = args.file
+    headless = args.headless
 
     if os.path.isfile(filename):
         SysPluginDirectory = os.path.abspath('sysplugins/')
@@ -28,7 +30,7 @@ if __name__ == '__main__':
         if not os.path.exists(UserPluginDirectory):
             os.makedirs(UserPluginDirectory)
 
-        spreadsheet.NewWindow(filename, [SysPluginDirectory, UserPluginDirectory])
+        spreadsheet.NewWindow(filename, [SysPluginDirectory, UserPluginDirectory], headless)
     else:
         print("DougSheets: File does not exist: " + filename)
 

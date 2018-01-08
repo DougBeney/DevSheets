@@ -4,6 +4,7 @@ import wx.grid
 import pyexcel as pe
 
 from . import pluginmanager
+from . import repl
 
 
 class NewWindow:
@@ -20,21 +21,26 @@ class NewWindow:
 
 
     def init_menu(self):
-        # Menu Bar
-        self.MenuBar = wx.MenuBar()
-        self.frame.SetMenuBar(self.MenuBar)
+        if not self.headless:
+            # Menu Bar
+            self.MenuBar = wx.MenuBar()
+            self.frame.SetMenuBar(self.MenuBar)
 
-        # File Menu
-        self.menu_file = wx.Menu()
-        self.MenuBar.Append(self.menu_file, '&File')
+            # File Menu
+            self.menu_file = wx.Menu()
+            self.MenuBar.Append(self.menu_file, '&File')
 
-        # Edit Menu
-        self.menu_edit = wx.Menu()
-        self.MenuBar.Append(self.menu_edit, '&Edit')
+            # Edit Menu
+            self.menu_edit = wx.Menu()
+            self.MenuBar.Append(self.menu_edit, '&Edit')
 
-        # Filter Menu
-        self.menu_filter = wx.Menu()
-        self.MenuBar.Append(self.menu_filter, 'F&ilters')
+            # Filter Menu
+            self.menu_filter = wx.Menu()
+            self.MenuBar.Append(self.menu_filter, 'F&ilters')
+        else:
+            self.menu_file = None
+            self.menu_edit = None
+            self.menu_filter = None
 
     def clear_sheet(self, rows, cols):
         cur_rows = self.sheetWidget.GetNumberCols()
@@ -48,7 +54,8 @@ class NewWindow:
     def load_sheet(self, filename):
         # loaded_sheet = pe.get_dict(file_name=filename)
         self.sheetObject = pe.get_array(file_name=filename)
-        self.update_sheet()
+        if not self.headless:
+            self.update_sheet()
 
     def update_sheet(self):
         sheetObject = self.sheetObject
@@ -76,19 +83,32 @@ class NewWindow:
     def showMessage(self, title, text, styles=wx.OK):
         wx.MessageBox(str(text), str(title), styles)
 
-    def __init__(self, filename, pluginDirs=[os.path.abspath('sysplugins/')]):
-        app = wx.App()
-        self.frame = wx.Frame(None, -1, filename)
-        # Setting size twice to avoid sheet glitch
-        self.frame.SetSize((500, 600))
-        self.frame.Show()
-        self.frame.SetSize((800, 600))
+    def __init__(self, filename, pluginDirs, headless=False):
+        self.headless = headless
+        if not headless:
+            # Enter GUI Mode
+            app = wx.App()
+            self.frame = wx.Frame(None, -1, filename)
+            # Setting size twice to avoid sheet glitch
+            self.frame.SetSize((500, 600))
+            self.frame.Show()
+            self.frame.SetSize((800, 600))
 
-        self.init_window()
-        self.init_menu()
-        self.filename = filename
-        self.load_sheet(filename)
-        self.pluginmanager = pluginmanager.LoadPlugins(self, pluginDirs)
-        self.frame.Show()
-        self.frame.Center()
-        app.MainLoop()
+            self.init_window()
+            self.init_menu()
+            self.filename = filename
+            self.load_sheet(filename)
+            self.pluginmanager = pluginmanager.LoadPlugins(self, pluginDirs)
+            self.frame.Show()
+            self.frame.Center()
+            app.MainLoop()
+        else:
+            # Enter Headless Mode
+            # It is worth noting that in headless mode, the terminology of a 'menu' change
+            # A 'menu' is no longer a visual menu in a GUI, but instead a set of commands
+            # accessible by the CLI.
+            self.init_menu()
+            self.filename = filename
+            self.load_sheet(filename)
+            self.pluginmanager = pluginmanager.LoadPlugins(self, pluginDirs)
+            repl.CreateREPL(self)
